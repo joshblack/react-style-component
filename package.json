@@ -1,0 +1,27 @@
+{
+  "name": "react-style-component",
+  "version": "0.0.1",
+  "main": "dist/Style.js",
+  "author": "Josh Black",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/joshblack/react-style-component"
+  },
+  "scripts": {
+    "build": "babel -d ./dist ./src",
+    "prepublish": "npm run build",
+    "test": "mocha -w --compilers js:babel/register"
+  },
+  "dependencies": {
+    "babel": "^5.2.12",
+    "babel-core": "^4.6.6",
+    "babel-eslint": "^2.0.2",
+    "chai": "^2.3.0",
+    "eslint": "^0.17.1",
+    "lodash": "^3.7.0",
+    "mocha": "^2.2.4"
+  },
+  "peerDependencies": {
+    "react": "^0.13.1"
+  }
+}

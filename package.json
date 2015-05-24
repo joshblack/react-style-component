@@ -8,9 +8,9 @@
     "url": "https://github.com/joshblack/react-style-component"
   },
   "scripts": {
-    "build": "babel -d ./dist ./src",
+    "build": "make build",
     "prepublish": "npm run build",
-    "test": "./node_modules/.bin/karma start"
+    "test": "make test"
   },
   "dependencies": {
     "babel": "^5.2.12",

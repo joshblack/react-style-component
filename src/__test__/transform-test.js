@@ -1,6 +1,6 @@
 import { expect } from 'chai';
-import transform from '../src/core/transform';
-import autoprefix from '../src/vendor/autoprefix';
+import transform from '../core/transform';
+import autoprefix from '../vendor/autoprefix';
 
 describe('#transform', () => {
   it('should transform declarations', () => {

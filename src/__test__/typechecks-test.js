@@ -1,8 +1,8 @@
 import assert from 'assert';
-import isDeclaration from '../src/utils/typechecks/isDeclaration';
-import isMedia from '../src/utils/typechecks/isMedia';
-import isPseudoClass from '../src/utils/typechecks/isPseudoClass';
-import isPseudoElement from '../src/utils/typechecks/isPseudoElement';
+import isDeclaration from '../utils/typechecks/isDeclaration';
+import isMedia from '../utils/typechecks/isMedia';
+import isPseudoClass from '../utils/typechecks/isPseudoClass';
+import isPseudoElement from '../utils/typechecks/isPseudoElement';
 
 describe('typechecks', () => {
   describe('#isDeclaration', () => {

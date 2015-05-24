@@ -1,5 +1,5 @@
 import { Children, cloneElement } from 'react';
-import getStylesFrom from '../core/getStylesFrom';
+import getStylesFrom from './core/getStylesFrom';
 
 export default class Style {
   render () {

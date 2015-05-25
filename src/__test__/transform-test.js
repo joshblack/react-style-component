@@ -5,13 +5,13 @@ import autoprefix from '../vendor/autoprefix';
 describe('#transform', () => {
   before(() => { global.__DEV__ = true });
 
-  it('should return a declaration from a property', () => {
+  it('should return a ruleset from a property', () => {
     const input = { display: 'block' };
 
     expect(transform(input, 'a'))
       .toEqual([
         {
-          selector: 'a',
+          selector: '.a',
           block: [['display', 'block']]
         }
       ]);
@@ -23,7 +23,7 @@ describe('#transform', () => {
     expect(transform(input, 'a'))
       .toEqual([
         {
-          selector: 'a:hover',
+          selector: '.a:hover',
           block: [['background', 'black']]
         }
       ]);
@@ -35,8 +35,27 @@ describe('#transform', () => {
     expect(transform(input, 'a'))
       .toEqual([
         {
-          selector: 'a::before',
+          selector: '.a::before',
           block: [['content', '']]
+        }
+      ]);
+  });
+
+  it('should return a statement from a media query', () => {
+    const input = { fontSize: { 'min-width: 320px': '2em', default: '1em' } };
+
+    expect(transform(input, 'a'))
+      .toEqual([
+        {
+          'at-rule': 'media',
+          query: 'min-width: 320px',
+          rulesets: [
+            { selector: '.a', block: [['font-size', '2em']] }
+          ]
+        },
+        {
+          selector: '.a',
+          block: [['font-size', '1em']]
         }
       ]);
   });
@@ -47,7 +66,7 @@ describe('#transform', () => {
     expect(transform(input, 'a'))
       .toEqual([
         {
-          selector: 'a',
+          selector: '.a',
           block: [['font-size', '1em']]
         }
       ]);

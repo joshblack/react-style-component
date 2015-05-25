@@ -1,11 +1,16 @@
 import isPseudo from '../utils/typechecks/isPseudo';
 import getType from '../utils/getType';
 
+// styles: Map<Declarations, Pseudo, Media>
+// className: string
 export default function format(styles, className) {
   let str = '';
 
-  for (let [key, value] of styles.entries()) {
+  if (!styles) {
+    return ruleset(selector(`.${className}`), block());
+  }
 
+  for (let [key, value] of styles.entries()) {
     if (key === 'declarations') {
       const wrapper = wrap(className);
 
@@ -54,6 +59,22 @@ export default function format(styles, className) {
   }
 
   return str;
+}
+
+function ruleset(selector, block) {
+  return __DEV__
+    ? `\n${selector} ${block}\n`
+    : `${selector}${block}`
+}
+
+function selector(...selectors) {
+  return selectors.join('');
+}
+
+function block(...declarations) {
+  return __DEV__
+    ? `{\n${declarations.join('\n')}\n}`
+    : `{${declarations.join('')}}`;
 }
 
 function media(query) {

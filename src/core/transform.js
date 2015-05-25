@@ -1,14 +1,14 @@
+import { pairs } from 'lodash';
 import getType from '../utils/getType';
 import hyphenate from '../vendor/hyphenate';
 import invariant from '../vendor/invariant';
 import deepMapKeys from '../utils/deepMapKeys';
-import { pairs, pick } from 'lodash';
 
 function ruleset(selector, block) {
   return { selector, block };
 }
 
-function Media(query, ...rulesets) {
+function media(query, ...rulesets) {
   return { 'at-rule': 'media', query, rulesets };
 }
 
@@ -17,15 +17,15 @@ const classifiers = {
     return ruleset(`.${className}`, [[property, value]]);
   },
   pseudoClass(keyword, declarations, className) {
-    return ruleset(`.${className}:${keyword}`, pairs(declarations));
+    return transform(declarations, `${className}:${keyword}`);
   },
   pseudoElement(keyword, declarations, className) {
-    return ruleset(`.${className}::${keyword}`, pairs(declarations));
+    return transform(declarations, `${className}::${keyword}`);
   },
-  media(property, queries, className) {
+  media: function(property, queries, className) {
     return Object.keys(queries).reduce((p, query) => {
       const rs = ruleset(`.${className}`, [[property, queries[query]]]);
-      const rule = (query !== 'default') ? Media(query, rs) : rs;
+      const rule = (query !== 'default') ? media(query, rs) : rs;
 
       return p.concat(rule);
     }, []);
@@ -39,11 +39,7 @@ export default function transform(props, className) {
     const type = getType(key, properties[key]),
           classifier = classifiers[type];
 
-    invariant(
-      classifier,
-      'Currently unsupported CSS feature: %s',
-      type
-    );
+    invariant(classifier, 'Currently unsupported CSS feature: %s', type);
 
     return p.concat(classifier(key, properties[key], className));
   }, []);

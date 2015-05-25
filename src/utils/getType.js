@@ -17,6 +17,6 @@ export default function getType(key, value) {
   }
 
   throw new Error(
-    `Invalid Property Type \`${classifiers.get(classifier)}\` on a Style Component`
+    `Invalid Property Type \`${key}\` on a Style Component`
   );
 }

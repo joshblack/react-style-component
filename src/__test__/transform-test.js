@@ -2,15 +2,19 @@ import expect from 'expect';
 import transform from '../core/transform';
 import autoprefix from '../vendor/autoprefix';
 
-
 describe('#transform', () => {
   before(() => { global.__DEV__ = true });
 
   it('should return a declaration from a property', () => {
     const input = { display: 'block' };
 
-    expect(transform(input))
-      .toEqual([['display', 'block']]);
+    expect(transform(input, 'a'))
+      .toEqual([
+        {
+          selector: 'a',
+          block: [['display', 'block']]
+        }
+      ]);
   });
 
   it('should return a ruleset from a pseudo class', () => {
@@ -40,8 +44,13 @@ describe('#transform', () => {
   it('should hyphenate property values that should be hyphenated', () => {
     const input = { fontSize: '1em' };
 
-    expect(transform(input))
-      .toEqual([['font-size', '1em']]);
+    expect(transform(input, 'a'))
+      .toEqual([
+        {
+          selector: 'a',
+          block: [['font-size', '1em']]
+        }
+      ]);
   });
 
   it('should throw for invalid properties on the component', () => {

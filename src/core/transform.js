@@ -4,20 +4,14 @@ import invariant from '../vendor/invariant';
 import deepMapKeys from '../utils/deepMapKeys';
 import { pairs } from 'lodash';
 
-function declaration(key, value) {
-  return [key, value];
-}
-
-function block(...declarations) {
-  return [...declarations];
-}
-
 function ruleset(selector, block) {
   return { selector, block };
 }
 
 const classifiers = {
-  declaration,
+  declaration(property, value, className) {
+    return ruleset(`${className}`, [[property, value]]);
+  },
   pseudoClass(keyword, declarations, className) {
     return ruleset(`${className}:${keyword}`, pairs(declarations));
   },

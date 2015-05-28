@@ -1,4 +1,3 @@
-import { pairs } from 'lodash';
 import getType from '../utils/getType';
 import hyphenate from '../vendor/hyphenate';
 import invariant from '../vendor/invariant';

@@ -28,6 +28,12 @@ function identifier(statement) {
 }
 
 function join(first, second) {
+  if (first['at-rule']) {
+    const rulesets = consolidate(first['rulesets'].concat(second['rulesets']));
+
+    return { ...first, ...second, rulesets };
+  }
+
   return merge(first, second, (a, b) => {
     if (isArray(a)) {
       return a.concat(b)

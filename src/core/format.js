@@ -1,100 +1,56 @@
-import isPseudo from '../utils/typechecks/isPseudo';
-import getType from '../utils/getType';
+import cssbeautify from 'cssbeautify';
 
-// styles: Map<Declarations, Pseudo, Media>
-// className: string
-export default function format(styles, className) {
-  let str = '';
+export default function format(statements) {
+  const formatted = statements.reduce(
+    (p, statement) => join(p, print(statement)), '');
 
-  if (!styles) {
-    return ruleset(selector(`.${className}`), block());
-  }
+  return __DEV__ ? cssbeautify(formatted) : formatted;
+}
 
-  for (let [key, value] of styles.entries()) {
-    if (key === 'declarations') {
-      const wrapper = wrap(className);
+function join(...strings) {
+  return strings.join('');
+}
 
-      value = value.map((v) => {
-        const [property, value] = v;
-
-        return `\t${property}: ${value};`;
-      });
-
-      str = str + wrapper(value.join('\n'))
-    }
-    else if (isPseudo(key)) {
-      const wrapper = wrap(className, key);
-
-      value = value.map((v) => {
-        const [property, value] = v;
-
-        return `\t${property}: ${value};`;
-      });
-
-      str = str + wrapper(value.join('\n'))
-    }
-    else {
-      const wrapper = media(key);
-      let inner = '';
-
-      for (let [key, values] of value.entries()) {
-
-        const wrapper = key === 'declarations'
-          ? wrap(className)
-          : wrap(className, key);
-
-        if (values.length !== 0) {
-          values = values.map((v) => {
-            const [property, value] = v;
-
-            return `\t${property}: ${value};`;
-          });
-
-          inner = inner + wrapper(values.join('\n'))
-        }
-      }
-
-      str = str + wrapper(inner);
+function print(statement) {
+  const printers = {
+    selector() {
+      return ruleset(statement['selector'], statement['block'])
+    },
+    media: function () {
+      return media(statement);
     }
   }
 
-  return str;
+  return printers[type(statement)]();
 }
 
-function ruleset(selector, block) {
-  return __DEV__
-    ? `\n${selector} ${block}\n`
-    : `${selector}${block}`
-}
-
-function selector(...selectors) {
-  return selectors.join('');
-}
-
-function block(...declarations) {
-  return __DEV__
-    ? `{\n${declarations.join('\n')}\n}`
-    : `{${declarations.join('')}}`;
-}
-
-function media(query) {
-  return function inner(content) {
-    return `\n@media ${query} {\n${content}\n}\n`;
+function type(statement) {
+  if (statement['selector']) {
+    return 'selector';
+  }
+  else if (statement['at-rule'] === 'media') {
+    return 'media';
+  }
+  else {
+    throw new Error('Invalid statement type.');
   }
 }
 
-function wrap(className, selector) {
-  const s = selector
-    ? Selector(getType(selector), selector)
-    : undefined;
+function media(statement) {
+  const { query, rulesets } = statement;
 
-  return function wrapContent(content) {
-    return s
-      ? `\n.${className}${s} {\n${content}\n}\n`
-      : `\n.${className} {\n${content}\n}\n`;
-  }
+  return join('@media', query, '{', format(rulesets), '}');
 }
 
-function Selector(type, keyword) {
-  return type === 'pseudoClass' ? `:${keyword}` : `::${keyword}`;
+function ruleset(selector, declarations) {
+  return join(selector, block(declarations));
+}
+
+function block(declarations) {
+  return join(
+    '{',
+    declarations.reduce(
+      (p, d) => join(p, `${d[0]}:${d[1]};`), ''),
+    '}'
+  );
 }

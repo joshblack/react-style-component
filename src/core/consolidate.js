@@ -1,55 +1,42 @@
-export default function consolidate(styles) {
-  const rulesets = styles.filter((style) => style['rule'] === 'declaration')
-    .reduce((p, style) => {
-      const { selector, property, value } = style;
+import { merge, isArray } from 'lodash';
 
-      if (selector) {
-        return !p.has(selector)
-          ? (p.set(selector, [[property, value]]), p)
-          : (p.get(selector).push([property, value]), p);
-      }
-      else {
-        p.get('declarations').push([property, value]);
-        return p;
-      }
+export default function consolidate(statements) {
+  const reduced = statements.reduce((p, s) => {
+    const identity = identifier(s);
 
-    }, new Map([ ['declarations', []] ]));
+    return p.has(identity)
+      ? p.set(identity, join(p.get(identity), s))
+      : p.set(identity, s)
+  }, new Map());
 
-  const media = styles.filter((style) => style['rule'] === 'media')
-    .reduce((p, style) => {
-      const { selector, query, property, value } = style;
+  return values(reduced);
+}
 
-      if (!p.get(query)) {
-        if (selector) {
-          p.set(query, new Map([
-            ['declarations', []],
-            [selector, [[property, value]]]
-          ]))
-        }
-        else {
-          p.set(query, new Map([
-            ['declarations', [[property, value]]]
-          ]));
-        }
+function values(map) {
+  const a = Array(map.size);
+  let i = 0;
 
-        return p;
-      }
-      else {
-        const declarations = p.get(query).get('declarations');
-        const selectors = p.get(query).get(selector) || [];
+  for (let value of map.values()) {
+    a[i++] = value;
+  }
 
-        if (selector) {
-          p.get(query).set(selector,
-            selectors.concat([[property, value]]));
-        }
-        else {
-          p.get(query).set('declarations',
-            declarations.concat([[property, value]]));
-        }
+  return a;
+}
 
-        return p;
-      }
-    }, new Map());
+function identifier(statement) {
+  return statement['selector'] || statement['query'];
+}
 
-  return new Map([...rulesets, ...media]);
+function join(first, second) {
+  if (first['at-rule'] && second['at-rule']) {
+    const rulesets = consolidate(first['rulesets'].concat(second['rulesets']));
+
+    return { ...first, ...second, rulesets };
+  }
+
+  return merge(first, second, (a, b) => {
+    if (isArray(a)) {
+      return a.concat(b)
+    }
+  });
 }

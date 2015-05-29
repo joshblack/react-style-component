@@ -1,48 +1,45 @@
+import getType from '../utils/getType';
 import hyphenate from '../vendor/hyphenate';
+import invariant from '../vendor/invariant';
 import deepMapKeys from '../utils/deepMapKeys';
-import isMedia from '../utils/typechecks/isMedia';
-import isPseudo from '../utils/typechecks/isPseudo';
 
-export default function transform(props, selector) {
-  const styles = deepMapKeys(props, hyphenate);
+function ruleset(selector, block) {
+  return { selector, block };
+}
 
-  return Object.keys(styles).reduce((p, key) => {
-    if (isPseudo(key)) {
-      return p.concat(...transform(styles[key], key));
-    }
-    else if (isMedia(key, styles[key])) {
-      const { rule, queries, value } = styles[key];
+function media(query, ...rulesets) {
+  return { 'at-rule': 'media', query, rulesets };
+}
 
-      // Lift default value
-      const declaration = {
-        rule: 'declaration',
-        selector,
-        property: key,
-        value
-      };
+const classifiers = {
+  declaration(property, value, className) {
+    return ruleset(`.${className}`, [[property, value]]);
+  },
+  pseudoClass(keyword, declarations, className) {
+    return transform(declarations, `${className}:${keyword}`);
+  },
+  pseudoElement(keyword, declarations, className) {
+    return transform(declarations, `${className}::${keyword}`);
+  },
+  media: function(property, queries, className) {
+    return Object.keys(queries).reduce((p, query) => {
+      const rs = ruleset(`.${className}`, [[property, queries[query]]]);
+      const rule = (query !== 'default') ? media(query, rs) : rs;
 
-      const q = queries.reduce((p, query) => {
-        const [queryString, propertyValue] = query;
+      return p.concat(rule);
+    }, []);
+  }
+};
 
-        return p.concat({
-          rule,
-          selector,
-          query: queryString,
-          property: key,
-          value: propertyValue
-        });
+export default function transform(props, className) {
+  const properties = deepMapKeys(props, hyphenate);
 
-      }, []);
+  return Object.keys(properties).reduce((p, key) => {
+    const type = getType(key, properties[key]),
+          classifier = classifiers[type];
 
-      return p.concat(...[declaration, ...q]);
-    }
-    else {
-      return p.concat({
-        rule: 'declaration',
-        selector,
-        property: key,
-        value: styles[key]
-      });
-    }
+    invariant(classifier, 'Currently unsupported CSS feature: %s', type);
+
+    return p.concat(classifier(key, properties[key], className));
   }, []);
 }

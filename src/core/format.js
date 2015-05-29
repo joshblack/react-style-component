@@ -1,100 +1,130 @@
 import isPseudo from '../utils/typechecks/isPseudo';
 import getType from '../utils/getType';
 
+export default function format(statements) {
+  return statements.reduce((p, statement) => {
+    return join(p, print(statement));
+  }, String());
+}
+
+function join(...strings) {
+  return strings.join('').trim();
+}
+
+function print(statement) {
+  const { selector, block } = statement;
+
+  return ruleset(selector, block);
+}
+
+function ruleset(selector, declarations) {
+  return join(selector, block(declarations));
+}
+
+function block(declarations) {
+  return join(
+    '{',
+    declarations.reduce(
+      (p, d) => join(p, `${d[0]}:${d[1]};`), ''),
+    '}'
+  );
+}
+
+
 // styles: Map<Declarations, Pseudo, Media>
 // className: string
-export default function format(styles, className) {
-  let str = '';
+// export default function format(styles, className) {
+//   let str = '';
 
-  if (!styles) {
-    return ruleset(selector(`.${className}`), block());
-  }
+//   if (!styles) {
+//     return ruleset(selector(`.${className}`), block());
+//   }
 
-  for (let [key, value] of styles.entries()) {
-    if (key === 'declarations') {
-      const wrapper = wrap(className);
+//   for (let [key, value] of styles.entries()) {
+//     if (key === 'declarations') {
+//       const wrapper = wrap(className);
 
-      value = value.map((v) => {
-        const [property, value] = v;
+//       value = value.map((v) => {
+//         const [property, value] = v;
 
-        return `\t${property}: ${value};`;
-      });
+//         return `\t${property}: ${value};`;
+//       });
 
-      str = str + wrapper(value.join('\n'))
-    }
-    else if (isPseudo(key)) {
-      const wrapper = wrap(className, key);
+//       str = str + wrapper(value.join('\n'))
+//     }
+//     else if (isPseudo(key)) {
+//       const wrapper = wrap(className, key);
 
-      value = value.map((v) => {
-        const [property, value] = v;
+//       value = value.map((v) => {
+//         const [property, value] = v;
 
-        return `\t${property}: ${value};`;
-      });
+//         return `\t${property}: ${value};`;
+//       });
 
-      str = str + wrapper(value.join('\n'))
-    }
-    else {
-      const wrapper = media(key);
-      let inner = '';
+//       str = str + wrapper(value.join('\n'))
+//     }
+//     else {
+//       const wrapper = media(key);
+//       let inner = '';
 
-      for (let [key, values] of value.entries()) {
+//       for (let [key, values] of value.entries()) {
 
-        const wrapper = key === 'declarations'
-          ? wrap(className)
-          : wrap(className, key);
+//         const wrapper = key === 'declarations'
+//           ? wrap(className)
+//           : wrap(className, key);
 
-        if (values.length !== 0) {
-          values = values.map((v) => {
-            const [property, value] = v;
+//         if (values.length !== 0) {
+//           values = values.map((v) => {
+//             const [property, value] = v;
 
-            return `\t${property}: ${value};`;
-          });
+//             return `\t${property}: ${value};`;
+//           });
 
-          inner = inner + wrapper(values.join('\n'))
-        }
-      }
+//           inner = inner + wrapper(values.join('\n'))
+//         }
+//       }
 
-      str = str + wrapper(inner);
-    }
-  }
+//       str = str + wrapper(inner);
+//     }
+//   }
 
-  return str;
-}
+//   return str;
+// }
 
-function ruleset(selector, block) {
-  return __DEV__
-    ? `\n${selector} ${block}\n`
-    : `${selector}${block}`
-}
+// function ruleset(selector, block) {
+//   return __DEV__
+//     ? `\n${selector} ${block}\n`
+//     : `${selector}${block}`
+// }
 
-function selector(...selectors) {
-  return selectors.join('');
-}
+// function selector(...selectors) {
+//   return selectors.join('');
+// }
 
-function block(...declarations) {
-  return __DEV__
-    ? `{\n${declarations.join('\n')}\n}`
-    : `{${declarations.join('')}}`;
-}
+// function block(...declarations) {
+//   return __DEV__
+//     ? `{\n${declarations.join('\n')}\n}`
+//     : `{${declarations.join('')}}`;
+// }
 
-function media(query) {
-  return function inner(content) {
-    return `\n@media ${query} {\n${content}\n}\n`;
-  }
-}
+// function media(query) {
+//   return function inner(content) {
+//     return `\n@media ${query} {\n${content}\n}\n`;
+//   }
+// }
 
-function wrap(className, selector) {
-  const s = selector
-    ? Selector(getType(selector), selector)
-    : undefined;
+// function wrap(className, selector) {
+//   const s = selector
+//     ? Selector(getType(selector), selector)
+//     : undefined;
 
-  return function wrapContent(content) {
-    return s
-      ? `\n.${className}${s} {\n${content}\n}\n`
-      : `\n.${className} {\n${content}\n}\n`;
-  }
-}
+//   return function wrapContent(content) {
+//     return s
+//       ? `\n.${className}${s} {\n${content}\n}\n`
+//       : `\n.${className} {\n${content}\n}\n`;
+//   }
+// }
 
-function Selector(type, keyword) {
-  return type === 'pseudoClass' ? `:${keyword}` : `::${keyword}`;
-}
+// function Selector(type, keyword) {
+//   return type === 'pseudoClass' ? `:${keyword}` : `::${keyword}`;
+// }

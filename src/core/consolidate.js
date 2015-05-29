@@ -28,7 +28,7 @@ function identifier(statement) {
 }
 
 function join(first, second) {
-  if (first['at-rule']) {
+  if (first['at-rule'] && second['at-rule']) {
     const rulesets = consolidate(first['rulesets'].concat(second['rulesets']));
 
     return { ...first, ...second, rulesets };

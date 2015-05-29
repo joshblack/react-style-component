@@ -1,9 +1,8 @@
 import cssbeautify from 'cssbeautify';
 
 export default function format(statements) {
-  const formatted = statements.reduce((p, statement) => {
-    return join(p, print(statement));
-  }, '');
+  const formatted = statements.reduce(
+    (p, statement) => join(p, print(statement)), '');
 
   return __DEV__ ? cssbeautify(formatted) : formatted;
 }

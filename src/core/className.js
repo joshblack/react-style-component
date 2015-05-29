@@ -6,25 +6,28 @@ const letters = [
 ];
 
 const BASE = letters.length;
-let bits = [-1];
 
 export default function className() {
-  inc(bits.length - 1);
-  return bits.reduce((p, v) => p + letters[v], '');
-}
+  let bits = [-1];
 
-function inc(i) {
-  if (bits[i] + 1 >= BASE) {
-    bits[i] = 0;
+  return function () {
+    inc(bits.length - 1);
+    return bits.reduce((p, v) => p + letters[v], '');
+  }
 
-    if (i - 1 >= 0) {
-      inc(i - 1);
+  function inc(i) {
+    if (bits[i] + 1 >= BASE) {
+      bits[i] = 0;
+
+      if (i - 1 >= 0) {
+        inc(i - 1);
+      }
+      else {
+        bits.unshift(0);
+      }
     }
     else {
-      bits.unshift(0);
+      bits[i] += 1;
     }
-  }
-  else {
-    bits[i] += 1;
   }
 }

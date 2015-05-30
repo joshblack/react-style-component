@@ -1,6 +1,6 @@
 import React from 'react';
 import Router from 'react-router';
-import routes from './src/routes';
+import routes from './routes';
 import 'core-js';
 
 window.React = React;

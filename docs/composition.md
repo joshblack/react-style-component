@@ -6,22 +6,8 @@ You can define your own presentational components using the Style component by d
 
 ```js
 class Blue extends Style {
-  constructor() {
-    // Inside of this super call, place any styles that you want
-    // passed into descending Style components
-    super({ color: 'blue' });
-  }
-}
-```
-
-You can also enhance this and make it even more useful with one simple change:
-
-```js
-class Blue extends Style {
-  constructor(props) {
-    // Inside of this super call, place any styles that you want
-    // passed into descending Style components
-    super({ color: 'blue', ...props });
+  static defaultProps = {
+    color: 'blue'
   }
 }
 ```

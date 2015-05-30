@@ -12,4 +12,4 @@ class Blue extends Style {
 }
 ```
 
-Now, you can even define Styles on these modified presentational components and they will be passed down as well. For example, `<Blue fontSize="1em">Hello World!</Blue>`.
+Now, you can even define CSS styles on these modified presentational components and they will be passed down as well. For example, `<Blue fontSize="1em">Hello World!</Blue>`.

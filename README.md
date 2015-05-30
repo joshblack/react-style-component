@@ -1,5 +1,7 @@
 # React Style Component
 
+![Demo](styles-demo.gif)
+
 > Proof of concept that defines a presentational component that wraps a data component.
 
 Users can define CSS properties such as declarations, pseudo elements, pseudo classes, and rules on this presentational component and they will be translated into CSS that will be injected above the wrapped component. The wrapped component will receive a CSS class name that all the properties declared on the presentational component will be defined under.
@@ -25,74 +27,26 @@ In order to help new developers understand the CSS that they're writing.
 ## Example
 
 ```js
-import { Component } from 'react';
-import Style from './Style';
-
-export default class App extends Component {
-  render () {
+class App {
+  render() {
     return (
-      <section>
-        <Style
-          // default declaration
-          fontFamily="Helvetica",
-          transition: "0.3s all",
-
-          // pseudo class with autoprefix
-          hover={{
-            cursor: 'pointer',
-            color: 'white'
-
-            // media declaration
-            background: {
-              rule: 'media',
-              queries: [
-                ['(min-width: 360px)', 'black'],
-                ['(min-width: 720px)', 'blue']
-              ],
-
-              // default value for media query
-              value: 'red'
-            }
-          }}
-        >
-          <h1>Hello Styles!</h1>
-        </Style>
-      </section>
+      <Style fontFamily="Helvetica">
+        <h1>Hello Styles!</h1>
+      </Style>
     );
   }
 }
-
 ```
 
-The above translates to the following html after being rendered by React and React Style Component:
+The above translates to the following `html` after being rendered by React and React Style Component:
 
-```
-<style>
-.a {
-    font-family: 'Helvetica';
-    transition: 0.3s all;
-    -webkit-transition: 0.3s all;
-    -moz-transition: 0.3s all;
-    -ms-transition: 0.3s all;
-}
-
-.a:hover {
-    cursor: pointer;
-    color: white;
-    background: red;
-}
-
-@media (min-width: 320px) {
-    .a:hover {
-        background: black;
-    }
-}
-
-@media (min-width: 720px) {
-    .a:hover {
-        background: blue;
-    }
-}
-</style>
-<h1 class="a">Hello Styles!</h1>
+```html
+<div>
+  <style>
+  .a {
+      font-family: 'Helvetica';
+  }
+  </style>
+  <h1 class="a">Hello Styles!</h1>
+</div>
 ```
